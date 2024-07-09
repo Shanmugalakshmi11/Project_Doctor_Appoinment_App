@@ -1,42 +1,26 @@
-import { View, Text, Image, Dimensions, TouchableOpacity } from "react-native";
 import React from "react";
-import app from "./../../assets/images/icon.png";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import {
+  View,
+  Text,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import app from "./../../assets/images/app.jpg";
+import SignInWithOAuth from "@/components/SignInWithOAuth";
 
 export default function Login() {
   return (
     <View style={{ alignItems: "center" }}>
       <Image source={app} style={styles.appImage} />
-      <View
-        style={{
-          backgroundColor: "#000",
-          padding: 25,
-          alignItems: "center",
-          marginTop: -50,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-        }}
-      >
+      <View style={styles.container}>
         <Text style={styles.heading}>Your Ultimate Doctor</Text>
         <Text style={styles.heading}>Appointment Booking App</Text>
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          Book Appointment Effortlessly and manager your healthJourney
+        <Text style={styles.description}>
+          Book Appointment Effortlessly and manage your health journey
         </Text>
-        <TouchableOpacity
-          onPress={() => console.log("Clicked")}
-          style={{
-            padding: 16,
-            backgroundColor: Colors.PRIMARY,
-            borderRadius: 90,
-            alignItems: "Center",
-            marginTop: 20,
-            width: Dimensions.get("screen").width * 0.8,
-          }}
-        >
-          <Text style={{ fontSize: 17, color: Colors.white }}>
-            Login with Google
-          </Text>
-        </TouchableOpacity>
+        <SignInWithOAuth />
       </View>
     </View>
   );
@@ -46,11 +30,37 @@ const styles = StyleSheet.create({
   appImage: {
     width: 300,
     height: 500,
-    ObjectFit: "contain",
-    marginTop,
+    resizeMode: "contain",
+    marginTop: 20, // You can define marginTop here
+  },
+  container: {
+    backgroundColor: "#000",
+    padding: 25,
+    alignItems: "center",
+    marginTop: -50,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   heading: {
     fontSize: 28,
     fontWeight: "bold",
+    color: "#fff",
+  },
+  description: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#fff", // Ensuring text color is visible on black background
+  },
+  button: {
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 90,
+    alignItems: "center",
+    marginTop: 20,
+    width: Dimensions.get("screen").width * 0.8,
+  },
+  buttonText: {
+    fontSize: 17,
+    color: "black", // Wrapped in quotes
   },
 });
