@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import app from "./../../assets/images/app.jpg";
-import SignInWithOAuth from "@/components/SignInWithOAuth";
+import SignInWithOAuth from "@/app/Components/SignInWithOAuth";
 
 export default function Login() {
   return (

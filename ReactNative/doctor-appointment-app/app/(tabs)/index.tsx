@@ -7,15 +7,17 @@ import {
   View,
 } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { HelloWave } from "@/app/Components/HelloWave";
+import ParallaxScrollView from "@/app/Components/ParallaxScrollView";
+import { ThemedText } from "@/app/Components/ThemedText";
+import { ThemedView } from "@/app/Components/ThemedView";
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import Login from "../Screens/Login";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
-import SignInWithOAuth from "@/components/SignInWithOAuth";
+import SignInWithOAuth from "@/app/Components/SignInWithOAuth";
 import Home from "../Screens/Home";
+import { NavigationContainer } from "@react-navigation/native";
+import TabNavigation from "../Navigations/TabNavigation";
 
 export default function HomeScreen() {
   return (
@@ -26,7 +28,9 @@ export default function HomeScreen() {
     >
       <SafeAreaView style={styles.Container}>
         <SignedIn>
-          <Home />
+          <NavigationContainer>
+            <TabNavigation />
+          </NavigationContainer>
         </SignedIn>
         <SignedOut>
           <Login />
