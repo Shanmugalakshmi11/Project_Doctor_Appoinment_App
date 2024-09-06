@@ -1,66 +1,58 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  Dimensions,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
+import LoginForm from "../Components/Home/LoginForm";
 import app from "./../../assets/images/app.jpg";
-import SignInWithOAuth from "@/app/Components/SignInWithOAuth";
 
-export default function Login() {
+const Login = ({ onLogin }) => {
   return (
-    <View style={{ alignItems: "center" }}>
+    <View style={styles.container}>
       <Image source={app} style={styles.appImage} />
-      <View style={styles.container}>
+      <View style={styles.formContainer}>
         <Text style={styles.heading}>Your Ultimate Doctor</Text>
         <Text style={styles.heading}>Appointment Booking App</Text>
         <Text style={styles.description}>
           Book Appointment Effortlessly and manage your health journey
         </Text>
-        <SignInWithOAuth />
+        <LoginForm onLogin={onLogin} />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
   appImage: {
     width: 300,
     height: 500,
     resizeMode: "contain",
-    marginTop: 20, // You can define marginTop here
+    marginTop: 20,
   },
-  container: {
-    backgroundColor: "#000",
+  formContainer: {
+    backgroundColor: "#fff",
     padding: 25,
     alignItems: "center",
-    marginTop: -50,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   heading: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   description: {
     textAlign: "center",
     marginTop: 20,
-    color: "#fff", // Ensuring text color is visible on black background
-  },
-  button: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 90,
-    alignItems: "center",
-    marginTop: 20,
-    width: Dimensions.get("screen").width * 0.8,
-  },
-  buttonText: {
-    fontSize: 17,
-    color: "black", // Wrapped in quotes
+    color: "#555",
   },
 });
+
+export default Login;

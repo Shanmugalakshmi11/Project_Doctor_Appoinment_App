@@ -1,10 +1,23 @@
-import { View, Text } from "react-native";
 import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 
-export default function Appointment() {
+const Appointment = () => {
   return (
-    <View>
-      <Text>Appointment</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>Appointment Screen</Text>
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 24,
+  },
+});
+
+export default Appointment;
