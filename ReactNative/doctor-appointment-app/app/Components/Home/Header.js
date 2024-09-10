@@ -1,21 +1,26 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-const headerImage = require("../../../assets/images/profile.png");
-const Header = () => {
-  // You can replace these values with real user data
-  const user = {
-    fullname: "Shanmugalakshmi Chandrasekaran",
-  };
 
+// Replace with the path to your profile image
+const headerImage = require("../../../assets/images/profile.png");
+
+const Header = ({ name, onLogout }) => {
   return (
     <View style={styles.headerContainer}>
       <View style={styles.userInfo}>
         <Image source={headerImage} style={styles.userImage} />
-        <Text style={styles.greeting}>Hello</Text>
-        <Text style={styles.username}>{user.fullname}</Text>
+        <View style={styles.greetingContainer}>
+          <Text style={styles.greeting}>Hello 👋</Text>
+          <Text style={styles.name}>{name}</Text>
+        </View>
       </View>
-      <Ionicons name="notifications-outline" size={28} color="black" />
+      <View style={styles.iconsContainer}>
+        <TouchableOpacity onPress={onLogout}>
+          <Ionicons name="log-out-outline" size={28} color="black" />
+        </TouchableOpacity>
+        <Ionicons name="notifications-outline" size={28} color="black" />
+      </View>
     </View>
   );
 };
@@ -27,6 +32,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     backgroundColor: "#f8f8f8",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   userInfo: {
     flexDirection: "row",
@@ -38,12 +45,20 @@ const styles = StyleSheet.create({
     borderRadius: 22.5,
     marginRight: 10,
   },
+  greetingContainer: {
+    flexDirection: "column",
+  },
   greeting: {
     fontSize: 16,
+    color: "#555",
   },
   username: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  iconsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 
