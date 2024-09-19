@@ -2,7 +2,7 @@ import React from "react";
 import { View, TextInput, Button, StyleSheet, Text } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import apiService from "../../services/apiService"; // Import your service
+import axios from "axios";
 
 // Validation Schema
 const SignupSchema = Yup.object().shape({
@@ -17,18 +17,23 @@ const SignupSchema = Yup.object().shape({
 });
 
 const SignupForm = ({ onSignup }) => {
-  const handleSignup = async (email, name, password) => {
-    const response = await apiService.signup(email, name, password);
-
-    if (response.success) {
-      // Handle successful signup (e.g., navigate to another screen, show message)
-      onSignup();
-    } else {
-      // Handle error, such as showing a message to the user
-      console.error("Signup failed:", response.message);
+  const handleSignup = async (name, email, password) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/signup",
+        {
+          name,
+          email,
+          password,
+        }
+      );
+      if (response.data.token) {
+        onSignup(email); // Handle successful signup
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
     }
   };
-
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}

@@ -1,23 +1,35 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+// Appointments.js
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const Appointment = () => {
+const Appointments = () => {
+  const [appointments, setAppointments] = useState([]);
+
+  useEffect(() => {
+    // Fetch appointments for a specific doctor (e.g., doctor with id 1)
+    axios
+      .get("http://localhost:3000/appointments/1")
+      .then((response) => {
+        setAppointments(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the appointments!", error);
+      });
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Appointment Screen</Text>
-    </View>
+    <div>
+      <h1>Appointments</h1>
+      <ul>
+        {appointments.map((appointment) => (
+          <li key={appointment.id}>
+            {appointment.patient} -{" "}
+            {new Date(appointment.appointment_time).toLocaleString()}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
-  },
-});
-
-export default Appointment;
+export default Appointments;

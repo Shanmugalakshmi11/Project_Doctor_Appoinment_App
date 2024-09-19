@@ -1,15 +1,46 @@
-const db = require("./db");
+const { DataTypes } = require("sequelize");
+const userSequelize = require("../models/db");
+const doctorModel = require("../models/doctorModel");
 
-const Appointment = {
-  create: (userId, doctorName, appointmentDate) => {
-    return db.execute(
-      "INSERT INTO appointments (user_id, doctor_name, appointment_date) VALUES (?, ?, ?)",
-      [userId, doctorName, appointmentDate]
-    );
+// Define the Appointment model
+const AppointmentModel = userSequelize.define(
+  "appointment",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
+    doctor_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: doctorModel,
+        key: "id",
+      },
+    },
+    patient_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    time: {
+      type: DataTypes.TIME, // Store appointment time
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "confirmed", "completed", "cancelled"),
+      allowNull: false,
+      defaultValue: "pending",
+    },
   },
-  findAllByUser: (userId) => {
-    return db.execute("SELECT * FROM appointments WHERE user_id = ?", [userId]);
-  },
-};
+  { tableName: "appointments" }
+);
 
-module.exports = Appointment;
+// Relationships
+AppointmentModel.belongsTo(doctorModel, {
+  foreignKey: "doctorId", // Doctor who the appointment is with
+  as: "doctors",
+});
+
+module.exports = AppointmentModel;
