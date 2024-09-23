@@ -1,15 +1,14 @@
-const Appointment = require("../models/appointmentModel");
+const AppointmentModel = require("../models/appointmentModel");
 
 exports.getAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.findAll();
+    // Fetch admin-specific data from the database
+    const appointments = await AppointmentModel.findAll(); // Adjust query as needed
+
     res.status(200).json(appointments);
   } catch (err) {
-    console.error("Error fetching appointments:", err.message, err.stack);
-    res.status(500).json({
-      message: "Server error",
-      error: err.message, // Provide error message for more detail
-    });
+    console.error("Error fetching admin dashboard data:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -30,7 +29,7 @@ exports.postAppointments = async (req, res) => {
 
   try {
     // Create a new appointment record
-    const newAppointment = await Appointment.create({
+    const newAppointment = await AppointmentModel.create({
       doctor_id: doctor_id,
       patient_name: patient_name,
       time: time,

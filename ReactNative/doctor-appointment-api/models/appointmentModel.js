@@ -39,7 +39,7 @@ const AppointmentModel = userSequelize.define(
 
 // Relationships
 AppointmentModel.belongsTo(doctorModel, {
-  foreignKey: "doctorId", // Doctor who the appointment is with
+  foreignKey: "doctor_id", // Doctor who the appointment is with
   as: "doctors",
 });
 
