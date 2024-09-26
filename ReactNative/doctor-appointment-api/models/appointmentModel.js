@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const userSequelize = require("../models/db");
 const doctorModel = require("../models/doctorModel");
+const userModel = require("../models/userModel"); // Import UserModel
 
 // Define the Appointment model
 const AppointmentModel = userSequelize.define(
@@ -20,9 +21,30 @@ const AppointmentModel = userSequelize.define(
         key: "id",
       },
     },
+    doctor_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: doctorModel, // Reference UserModel
+        key: "name",
+      },
+    },
+    user_id: {
+      // Add a foreign key for the user
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: userModel, // Reference UserModel
+        key: "id",
+      },
+    },
     patient_name: {
       type: DataTypes.STRING,
       allowNull: false,
+      references: {
+        model: userModel, // Reference UserModel
+        key: "name",
+      },
     },
     time: {
       type: DataTypes.TIME, // Store appointment time
@@ -40,7 +62,13 @@ const AppointmentModel = userSequelize.define(
 // Relationships
 AppointmentModel.belongsTo(doctorModel, {
   foreignKey: "doctor_id", // Doctor who the appointment is with
-  as: "doctors",
+  as: "doctor", // Singular form for association
+});
+
+AppointmentModel.belongsTo(userModel, {
+  // Associate with UserModel
+  foreignKey: "user_id", // User who booked the appointment
+  as: "user", // Singular form for association
 });
 
 module.exports = AppointmentModel;

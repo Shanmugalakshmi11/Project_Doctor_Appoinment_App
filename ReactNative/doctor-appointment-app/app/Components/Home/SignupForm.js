@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TextInput, Button, StyleSheet, Text } from "react-native";
+import { View, TextInput, Button, StyleSheet, Text, Alert } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -11,9 +11,6 @@ const SignupSchema = Yup.object().shape({
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Confirm Password is required"),
 });
 
 const SignupForm = ({ onSignup }) => {
@@ -29,17 +26,26 @@ const SignupForm = ({ onSignup }) => {
       );
       if (response.data.token) {
         onSignup(email); // Handle successful signup
+      } else {
+        Alert.alert("Signup failed", "Please check your input.");
       }
     } catch (error) {
       console.error("Signup error:", error);
+      // Display error message to the user
+      Alert.alert(
+        "Signup error",
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
     }
   };
+
   return (
     <Formik
-      initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
+      initialValues={{ name: "", email: "", password: "" }}
       validationSchema={SignupSchema}
       onSubmit={(values) => {
-        handleSignup(values.email, values.name, values.password);
+        handleSignup(values.name, values.email, values.password);
       }}
     >
       {({
@@ -58,9 +64,9 @@ const SignupForm = ({ onSignup }) => {
             onBlur={handleBlur("name")}
             value={values.name}
           />
-          {touched.name && errors.name ? (
+          {touched.name && errors.name && (
             <Text style={styles.errorText}>{errors.name}</Text>
-          ) : null}
+          )}
 
           <TextInput
             style={styles.input}
@@ -70,9 +76,9 @@ const SignupForm = ({ onSignup }) => {
             onBlur={handleBlur("email")}
             value={values.email}
           />
-          {touched.email && errors.email ? (
+          {touched.email && errors.email && (
             <Text style={styles.errorText}>{errors.email}</Text>
-          ) : null}
+          )}
 
           <TextInput
             style={styles.input}
@@ -82,21 +88,9 @@ const SignupForm = ({ onSignup }) => {
             onBlur={handleBlur("password")}
             value={values.password}
           />
-          {touched.password && errors.password ? (
+          {touched.password && errors.password && (
             <Text style={styles.errorText}>{errors.password}</Text>
-          ) : null}
-
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            secureTextEntry
-            onChangeText={handleChange("confirmPassword")}
-            onBlur={handleBlur("confirmPassword")}
-            value={values.confirmPassword}
-          />
-          {touched.confirmPassword && errors.confirmPassword ? (
-            <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-          ) : null}
+          )}
 
           <Button title="Sign Up" onPress={handleSubmit} />
         </View>

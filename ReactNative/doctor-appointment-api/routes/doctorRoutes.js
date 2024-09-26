@@ -3,12 +3,17 @@ const {
   getDoctorById,
   getAppointmentsForDoctor,
   deleteAppointment,
+  getDoctorByEmail,
+  getDoctors,
 } = require("../controllers/doctorController");
+
 const router = express.Router();
 
+router.get("/doctors/email", getDoctorByEmail);
 // Get doctor details by ID
 router.get("/doctors/id", getDoctorById);
 
+router.get("/doctors/all", getDoctors);
 // Get appointments for a doctor
 router.get("/appointments/doctor/id", getAppointmentsForDoctor);
 

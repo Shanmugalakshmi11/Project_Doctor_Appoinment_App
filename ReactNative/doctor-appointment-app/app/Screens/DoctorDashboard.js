@@ -9,21 +9,25 @@ import {
   Button,
 } from "react-native";
 import { getToken } from "../services/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import moment from "moment"; // Import moment for date and time formatting
 
 const DoctorDashboard = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [doctors, setDoctors] = useState({}); // Store doctor names
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchEmailAndAppointments = async () => {
       try {
+        const email = await AsyncStorage.getItem("email");
+        if (!email) throw new Error("No email found");
+
         const token = await getToken();
         if (!token) throw new Error("No token provided");
 
-        const response = await fetch(
-          "http://localhost:3000/api/appointments/dashboard",
+        const doctorResponse = await fetch(
+          `http://localhost:3000/api/doctors/email?email=${email}`,
           {
             method: "GET",
             headers: {
@@ -33,16 +37,41 @@ const DoctorDashboard = ({ navigation }) => {
           }
         );
 
-        if (!response.ok) {
-          const errorResponse = await response.json();
+        if (!doctorResponse.ok) {
+          const errorResponse = await doctorResponse.json();
           throw new Error(
-            `Error: ${response.status} - ${errorResponse.message}`
+            `Error: ${doctorResponse.status} - ${errorResponse.message}`
           );
         }
 
-        const data = await response.json();
-        setAppointments(data);
-        await fetchDoctorNames(data); // Fetch doctor names
+        const doctorData = await doctorResponse.json();
+        const doctorId = parseInt(doctorData.doctor.id, 10); // Ensure it's a number
+        if (isNaN(doctorId)) {
+          throw new Error("Doctor ID is invalid");
+        }
+
+        console.log("Doctor ID:", doctorId); // Log doctor ID
+
+        const appointmentsResponse = await fetch(
+          `http://localhost:3000/api/appointments/doctor/id?doctor_id=${doctorId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!appointmentsResponse.ok) {
+          const errorResponse = await appointmentsResponse.json();
+          throw new Error(
+            `Error: ${appointmentsResponse.status} - ${errorResponse.message}`
+          );
+        }
+
+        const appointments = await appointmentsResponse.json();
+        setAppointments(appointments);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -50,27 +79,13 @@ const DoctorDashboard = ({ navigation }) => {
       }
     };
 
-    const fetchDoctorNames = async (appointments) => {
-      const fetchedDoctors = {};
-      for (const appointment of appointments) {
-        const doctorResponse = await fetch(
-          `http://localhost:3000/api/doctors/${appointment.doctor_id}`
-        );
-        if (doctorResponse.ok) {
-          const doctorData = await doctorResponse.json();
-          fetchedDoctors[appointment.doctor_id] = doctorData.name; // Assuming doctor data has a 'name' property
-        }
-      }
-      setDoctors(fetchedDoctors);
-    };
+    fetchEmailAndAppointments();
+  }, []); // Run once on mount
 
-    fetchAppointments();
-  }, []);
-
-  const deleteAppointment = async (appointmentId) => {
+  const deleteAppointment = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/appointments/appointmentId?${appointmentId}`, // Corrected URL
+        `http://localhost:3000/api/appointments/appointmentId?id=${id}`,
         {
           method: "DELETE",
           headers: {
@@ -86,7 +101,7 @@ const DoctorDashboard = ({ navigation }) => {
 
       // Remove the deleted appointment from the state
       setAppointments((prev) =>
-        prev.filter((appointments) => appointments.id !== appointmentId)
+        prev.filter((appointment) => appointment.id !== id)
       );
     } catch (err) {
       setError(err.message);
@@ -120,131 +135,115 @@ const DoctorDashboard = ({ navigation }) => {
           <FlatList
             data={appointments}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.appointment}>
-                <Text style={styles.doctor_id}>
-                  <Text style={styles.title1}>Doctor ID: </Text>
-                  {item.doctor_id}
-                </Text>
+            renderItem={({ item }) => {
+              // Split the date and time using moment
 
-                <Text style={styles.patientName}>
-                  <Text style={styles.title1}>Patient Name: </Text>
-                  {item.patient_name}
-                </Text>
-                <Text style={styles.time}>
-                  <Text style={styles.title1}>Date & Time: </Text>
-                  {item.time}
-                </Text>
-                <Text style={styles.status(item.status)}>
-                  <Text style={styles.title1}>Status: </Text>
-                  {item.status}
-                </Text>
+              const date = moment(item.time).format("YYYY-MM-DD"); // Date format: YYYY-MM-DD
+              const time = moment(item.time)
+                .utcOffset(0) //
+                .format("HH:mm:ss"); // Time format: 24-hour format (HH:mm)
+              return (
+                <View style={styles.appointment}>
+                  <Text style={styles.patientName}>
+                    <Text style={styles.title1}>Patient Name: </Text>
+                    {item.patient_name}
+                  </Text>
+                  <Text style={styles.time}>
+                    <Text style={styles.title1}>Date: </Text>
+                    {date}
+                  </Text>
+                  <Text style={styles.time}>
+                    <Text style={styles.title1}>Time: </Text>
+                    {time}
+                  </Text>
+                  <Text style={styles.status(item.status)}>
+                    <Text style={styles.title1}>Status: </Text>
+                    {item.status}
+                  </Text>
 
-                <View style={styles.buttonContainer}>
-                  <Button
-                    title="Delete"
-                    onPress={() => deleteAppointment(item.id)}
-                    color="#dc3545" // Red for delete button
-                  />
+                  <View style={styles.buttonContainer}>
+                    <Button
+                      title="Delete"
+                      onPress={() => deleteAppointment(item.id)}
+                      color="#dc3545"
+                    />
+                  </View>
                 </View>
-              </View>
-            )}
+              );
+            }}
           />
         )}
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#f8f9fa", // Light background
+    backgroundColor: "#fff",
+    padding: 20,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#dee2e6",
+    marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#343a40",
-  },
-  title1: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#343a40",
   },
   profileIcon: {
-    fontSize: 28,
+    fontSize: 24,
   },
   section: {
     flex: 1,
-    marginTop: 20,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: "#495057",
-  },
-  appointment: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  patientName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#007bff", // Blue for patient name
-    marginBottom: 4,
+    marginBottom: 10,
+  },
+  appointment: {
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 10,
+    width: 750,
+  },
+  patientName: {
+    fontSize: 26,
   },
   time: {
-    fontSize: 16,
-    color: "#6c757d", // Muted color for time
-    marginBottom: 4,
+    fontSize: 24,
+    color: "#555",
   },
   status: (status) => ({
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 20,
     color:
       status === "confirmed"
-        ? "#28a745" // Green for confirmed
+        ? "green"
         : status === "Scheduled"
-        ? "#17e0f8" // blue for scheduled
-        : status === "pending"
-        ? "#ffc107" // Yellow for pending
-        : "#dc3545", // Red for other statuses (like cancelled)
-    textTransform: "capitalize",
+        ? "blue"
+        : status === "completed"
+        ? "violet"
+        : "red",
   }),
+  buttonContainer: {
+    marginTop: 10,
+    alignContent: "center",
+    width: 200,
+  },
+  noAppointments: {
+    fontSize: 16,
+    color: "#999",
+  },
   errorText: {
     color: "red",
     fontSize: 16,
-    marginTop: 20,
-  },
-  noAppointments: {
-    fontSize: 18,
-    color: "#888",
     textAlign: "center",
-    marginTop: 20,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center", // Center the button horizontally
-    marginTop: 10, // Optional: Add some space above the button
   },
 });
 

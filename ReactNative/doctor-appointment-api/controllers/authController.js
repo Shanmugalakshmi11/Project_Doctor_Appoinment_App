@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 const Admin = require("../models/adminModel");
 const Doctor = require("../models/doctorModel");
 const { validationResult } = require("express-validator");
+const DoctorModel = require("../models/doctorModel");
 
 // Helper function to generate JWT
 const generateToken = (id, email) => {

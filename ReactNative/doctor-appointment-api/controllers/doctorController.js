@@ -2,6 +2,31 @@ const DoctorModel = require("../models/doctorModel"); // Assuming you have a Doc
 const AppointmentModel = require("../models/appointmentModel"); // Assuming you have an Appointment model
 const { StatusCodes, ReasonPhrases } = require("http-status-codes");
 
+// Controller function
+
+exports.getDoctorByEmail = async (req, res) => {
+  try {
+    const email = req.query.email; // Get the email from the query parameters
+
+    // Find the doctor by email
+    const doctor = await DoctorModel.findOne({
+      where: { email: email },
+    });
+
+    if (!doctor) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Doctor not found" });
+    }
+
+    res.status(StatusCodes.OK).json({ doctor });
+  } catch (error) {
+    console.error("Error fetching doctor: ", error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Error fetching doctor", error: error.message });
+  }
+};
 // Fetch doctor details by ID
 exports.getDoctorById = async (req, res) => {
   try {
@@ -41,11 +66,20 @@ exports.getDoctorById = async (req, res) => {
 // Fetch appointments for the doctor
 exports.getAppointmentsForDoctor = async (req, res) => {
   try {
-    const doctor_id = parseInt(req.query.doctor_id, 10); // Ensure doctorId is an integer
+    const doctor_id = parseInt(req.query.doctor_id, 10); // Ensure doctor_id is an integer
+
+    // Check if doctor_id is a valid number
+    if (isNaN(doctor_id)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Invalid doctor ID" });
+    }
+
+    console.log("Doctor_id:", doctor_id); // Log the doctor ID for debugging
 
     const appointments = await AppointmentModel.findAll({
       where: { doctor_id },
-    }); // Adjusted to use findAll
+    });
 
     if (!appointments.length) {
       return res
@@ -53,7 +87,7 @@ exports.getAppointmentsForDoctor = async (req, res) => {
         .json({ message: "No appointments found" });
     }
 
-    res.status(StatusCodes.OK).json(appointments); // Added status code for clarity
+    res.status(StatusCodes.OK).json(appointments);
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res
@@ -84,5 +118,18 @@ exports.deleteAppointment = async (req, res) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: "Server error" });
+  }
+};
+
+// Route to get doctors
+exports.getDoctors = async (req, res) => {
+  try {
+    const doctors = await DoctorModel.findAll();
+    res.status(200).json(doctors);
+  } catch (error) {
+    console.error("Error fetching doctors:", error); // Log the actual error to the console
+    res
+      .status(500)
+      .json({ message: "Error fetching doctors", error: error.message }); // Include error message in response
   }
 };
