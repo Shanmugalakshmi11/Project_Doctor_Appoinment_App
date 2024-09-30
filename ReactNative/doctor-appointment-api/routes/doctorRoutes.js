@@ -5,6 +5,7 @@ const {
   deleteAppointment,
   getDoctorByEmail,
   getDoctors,
+  getDoctorspecialty,
 } = require("../controllers/doctorController");
 
 const router = express.Router();
@@ -19,5 +20,5 @@ router.get("/appointments/doctor/id", getAppointmentsForDoctor);
 
 // Delete an appointment by ID
 router.delete("/appointments/appointmentId", deleteAppointment);
-
+router.get("/doctors/specialty", getDoctorspecialty);
 module.exports = router;

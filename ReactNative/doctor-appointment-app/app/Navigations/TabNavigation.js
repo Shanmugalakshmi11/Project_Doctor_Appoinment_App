@@ -4,6 +4,7 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import Home from "../Screens/Home";
 import Appointment from "../Screens/Appointment";
 import Profile from "../Screens/Profile";
+import StackNavigation from "../Navigations/StackNavigation";
 
 const Tab = createBottomTabNavigator();
 
@@ -32,6 +33,7 @@ const TabNavigation = () => {
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Appointment" component={Appointment} />
       <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Hospital Details" component={StackNavigation} />
     </Tab.Navigator>
   );
 };

@@ -133,3 +133,27 @@ exports.getDoctors = async (req, res) => {
       .json({ message: "Error fetching doctors", error: error.message }); // Include error message in response
   }
 };
+// Controller function to get doctors by specialty
+exports.getDoctorspecialty = async (req, res) => {
+  try {
+    const specialty = req.query.specialty; // Get the email from the query parameters
+
+    // Find the doctor by email
+    const doctors = await DoctorModel.findAll({
+      where: { specialty: specialty },
+    });
+
+    if (!doctors) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "specialty not found" });
+    }
+
+    res.status(StatusCodes.OK).json({ doctors });
+  } catch (error) {
+    console.error("Error fetching doctor: ", error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Error fetching doctor", error: error.message });
+  }
+};

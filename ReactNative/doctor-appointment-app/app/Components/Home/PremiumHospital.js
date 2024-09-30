@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { Card } from "react-native-elements";
 import axios from "axios";
-import { navigate } from "../Home/NavigationContext";
-import HospitalDetail from "./HospitalDetail";
+import { useNavigation } from "@react-navigation/native";
 
 const PremiumHospital = ({}) => {
+  const navigation = useNavigation();
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true); // For loading state
   const [error, setError] = useState(null); // For error handling
@@ -31,10 +31,9 @@ const PremiumHospital = ({}) => {
       });
   }, []);
 
-  const handleLearnMore = (id) => {
-    console.log("HOSPITAL ID", id);
-
-    navigate("HospitalDetail", { id });
+  const handleLearnMore = (hospitalId) => {
+    console.log("HospitalID", hospitalId);
+    navigation.navigate("HospitalDetail", { id: hospitalId });
   };
 
   const renderHospital = ({ item }) => (
@@ -53,6 +52,7 @@ const PremiumHospital = ({}) => {
         </View>
         <Text style={styles.description}>{item.description}</Text>
       </View>
+
       <Button
         title="Learn More"
         onPress={() => handleLearnMore(item.id)}

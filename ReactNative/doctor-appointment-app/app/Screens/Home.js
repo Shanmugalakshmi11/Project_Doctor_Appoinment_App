@@ -3,9 +3,8 @@ import { View, Text, StyleSheet } from "react-native";
 import Slider from "../Components/Home/Slider";
 import CategoryList from "../Components/Home/CategoryList";
 import PremiumHospital from "../Components/Home/PremiumHospital";
-import HospitalDetail from "../Components/Home/HospitalDetail";
-import { createStackNavigator } from "@react-navigation/stack";
-const Stack = createStackNavigator();
+import StackNavigation from "../Navigations/StackNavigation";
+
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 

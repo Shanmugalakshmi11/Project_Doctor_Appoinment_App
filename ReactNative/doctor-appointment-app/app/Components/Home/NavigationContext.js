@@ -1,10 +1,9 @@
-// navigationService.js
 import { CommonActions } from "@react-navigation/native";
 
 let navigator;
 
 export function setTopLevelNavigator(navigatorRef) {
-  navigator = navigatorRef;
+  navigator = navigatorRef; // Set the navigator reference
 }
 
 export function navigate(name, params) {
@@ -15,5 +14,7 @@ export function navigate(name, params) {
         params,
       })
     );
+  } else {
+    console.warn("Navigator is not set. Cannot navigate."); // Add a warning
   }
 }
