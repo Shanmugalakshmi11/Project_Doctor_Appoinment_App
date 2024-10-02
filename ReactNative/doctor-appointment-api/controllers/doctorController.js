@@ -121,6 +121,40 @@ exports.deleteAppointment = async (req, res) => {
   }
 };
 
+// Route to confirm an appointment
+exports.confirmAppointment = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+
+    // Check if the appointment ID is provided
+    if (!appointmentId) {
+      return res.status(400).json({ message: "Appointment ID is required" });
+    }
+
+    // Find the appointment by ID
+    const appointment = await AppointmentModel.findByPk(appointmentId);
+
+    // Check if the appointment exists
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Update the appointment status to 'confirmed'
+    appointment.status = "confirmed";
+    await appointment.save();
+
+    // Send the success response
+    res
+      .status(200)
+      .json({ message: "Appointment confirmed successfully", appointment });
+  } catch (error) {
+    console.error("Error confirming appointment:", error); // Log the actual error to the console
+    res
+      .status(500)
+      .json({ message: "Error confirming appointment", error: error.message }); // Include error message in response
+  }
+};
+
 // Route to get doctors
 exports.getDoctors = async (req, res) => {
   try {

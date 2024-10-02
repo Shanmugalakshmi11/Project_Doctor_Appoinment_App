@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Button,
+  Alert,
 } from "react-native";
 import { getToken } from "../services/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment"; // Import moment for date and time formatting
+import axios from "axios";
 
 const DoctorDashboard = ({ navigation }) => {
   const [appointments, setAppointments] = useState([]);
@@ -81,6 +83,36 @@ const DoctorDashboard = ({ navigation }) => {
 
     fetchEmailAndAppointments();
   }, []); // Run once on mount
+  const confirmAppointment = async (appointmentId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/appointments/confirm",
+        {
+          appointmentId: appointmentId,
+        }
+      );
+
+      if (response.status === 200) {
+        // Update the status in the state for the confirmed appointment
+        setAppointments((prevAppointments) =>
+          prevAppointments.map((appointment) =>
+            appointment.id === appointmentId
+              ? { ...appointment, status: "confirmed" }
+              : appointment
+          )
+        );
+        Alert.alert("Success", "Appointment confirmed successfully!");
+      } else {
+        Alert.alert("Error", "Failed to confirm the appointment.");
+      }
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "Something went wrong while confirming the appointment."
+      );
+      console.error(error);
+    }
+  };
 
   const deleteAppointment = async (id) => {
     try {
@@ -160,7 +192,13 @@ const DoctorDashboard = ({ navigation }) => {
                     <Text style={styles.title1}>Status: </Text>
                     {item.status}
                   </Text>
-
+                  <View style={styles.buttonContainer}>
+                    <Button
+                      title="Confirm"
+                      onPress={() => confirmAppointment(item.id)}
+                      color="green"
+                    />
+                  </View>
                   <View style={styles.buttonContainer}>
                     <Button
                       title="Delete"
