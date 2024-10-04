@@ -147,15 +147,6 @@ const DoctorDashboard = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Doctor Dashboard</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Text
-            style={styles.profileIcon}
-            accessible={true}
-            accessibilityLabel="Profile"
-          >
-            👤
-          </Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
